@@ -27,11 +27,6 @@ textarea{resize:vertical}
   --line:#d9e2ea;--blue:#0F4C81;--blue-dark:#0a355b;--green:#1E9E4A;--green-dark:#137a38;
   --green-soft:#e8f7ee;--amber:#fff7e5;--amber-line:#ecd9a6;
 }
-@media (prefers-color-scheme:dark){
-  :root{--bg:#0d151d;--surface:#14202c;--surface-2:#1a2a39;--ink:#edf3f7;--muted:#a7b8c7;
-    --line:#2c3f50;--blue:#2b7ac2;--blue-dark:#0F4C81;--green:#2fbd5f;--green-dark:#1E9E4A;
-    --green-soft:#173d27;--amber:#2d2a1c;--amber-line:#5a4f26;}
-}
 body{background:var(--bg);color:var(--ink);font-family:"Public Sans",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
 .font-display{font-family:"Sora","Public Sans",system-ui,sans-serif}
 .field{width:100%;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:12px;padding:11px 12px;outline:none;transition:.15s}
@@ -193,7 +188,6 @@ const fmtBRL = (v) =>
   new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 2 })
     .format(Number.isFinite(v) ? v : 0);
 
-/* Trata vazio/null/undefined corretamente — não vira 0 */
 function U(v, fallback = 0) {
   if (v === "" || v === null || v === undefined) return fallback;
   const s = String(v).trim();
@@ -203,9 +197,7 @@ function U(v, fallback = 0) {
 }
 
 /* ========== DADOS INICIAIS ========== */
-const TEXTO_PADRAO = {
-  tituloDoc: "", saudacao: "", apresentacao: "", comoFunciona: "", carro: "", rodape: "", condicoes: "", rotuloTotal: ""
-};
+const TEXTO_PADRAO = { tituloDoc: "", saudacao: "", apresentacao: "", comoFunciona: "", carro: "", rodape: "", condicoes: "", rotuloTotal: "" };
 
 const ESTADO_INICIAL = {
   proprietario: "", tipoImovel: "Terreno / Lote", condicao: "Usado",
@@ -314,10 +306,6 @@ function App() {
       ? `1ª de ${fmtBRL(primeiraParcela)} ${forma1} + 1 parcela de ${fmtBRL(parcelaComJuros)} no mês seguinte${sufixoJuros}`
       : `1ª de ${fmtBRL(primeiraParcela)} ${forma1} + ${demaisParcelas}x de ${fmtBRL(parcelaComJuros)} nos meses subsequentes${sufixoJuros}`;
 
-  const condParcelas = f === 1
-    ? `Parcela única — ${forma1}`
-    : `Dividida em ${f}x — 1ª ${forma1}`;
-
   const textoParcelasCurto = f === 1
     ? `Parcela única de ${fmtBRL(primeiraParcela)} ${forma1Min}`
     : f === 2
@@ -328,7 +316,6 @@ function App() {
   const diferenca = valorTotal - totalRecebido;
   const fecha = Math.abs(diferenca) < 0.01;
 
-  /* ---- Características do tipo ---- */
   const ehTerreno = e.tipoImovel === "Terreno / Lote";
   const ehCasa = ["Casa","Sobrado","Chácara / Sítio"].includes(e.tipoImovel);
   const ehApto = ["Apartamento","Cobertura"].includes(e.tipoImovel);
@@ -340,7 +327,6 @@ function App() {
   const labelLocal = ehApto ? "Condomínio / Bairro" : (ehCasa || ehComercial) ? "Bairro / Localização" : "Loteamento / Bairro";
   const labelMetragem = ehCasa ? "Metragem do terreno (m²)" : "Área total do terreno (m²)";
 
-  /* ---- Gênero / artigos dinâmicos ---- */
   const fem = ["Casa","Chácara / Sítio","Cobertura","Sala Comercial"].includes(e.tipoImovel);
   const artigo = fem ? "a" : "o";
   const possessivo = fem ? "sua" : "seu";
@@ -356,13 +342,8 @@ function App() {
   const adjetivoUsado = fem ? "usada" : "usado";
   const adjetivoPronto = fem ? "pronta" : "pronto";
   const descricaoCurta = `${artigo} ${possessivo} ${nomeImovel}`;
+  const finalidade = ehTerreno ? "construir" : ehComercial ? "uso comercial" : "morar";
 
-  /* ---- Verbo por tipo (CORRIGIDO: terreno não "mora") ---- */
-  const finalidade = ehTerreno ? "construir"
-    : ehComercial ? "uso comercial"
-    : "morar";
-
-  /* ---- Descrição do imóvel ---- */
   const descricaoImovel = useMemo(() => {
     const bairro = e.loteamento.trim();
     const cidade = e.cidade.trim();
@@ -391,7 +372,6 @@ function App() {
     return partes.join(" — ");
   }, [e, metragem, areaConstruida, areaTotal, ehTerreno, ehCasa, ehApto, ehComercial, ehPredio]);
 
-  /* ---- Características listadas ---- */
   const caracteristicas = [];
   if (U(e.quartos)) caracteristicas.push(`${U(e.quartos)} ${U(e.quartos) === 1 ? "quarto" : "quartos"}`);
   if (U(e.banheiros)) caracteristicas.push(`${U(e.banheiros)} ${U(e.banheiros) === 1 ? "banheiro" : "banheiros"}`);
@@ -401,7 +381,6 @@ function App() {
   if (e.diferenciais.trim()) caracteristicas.push(e.diferenciais.trim());
   const textoCaracteristicas = caracteristicas.join(" • ");
 
-  /* ---- Condição descrita (CORRIGIDO: verbo por finalidade) ---- */
   const descricaoCondicao = useMemo(() => {
     if (e.condicao === "Novo") return `${nomeImovel} ${adjetivoNovo}, ${adjetivoPronto} para ${finalidade}`;
     if (e.condicao === "Usado") return `${nomeImovel} ${adjetivoUsado}, no estado em que se encontra`;
@@ -441,7 +420,6 @@ function App() {
   const condicoesFinal = pegarTexto("condicoes", condicoesPadrao);
   const rotuloTotalFinal = pegarTexto("rotuloTotal", "Total recebido pelo proprietário");
 
-  /* ---- Handlers ---- */
   const atualizarTexto = (campo, valorAtual) => {
     const atual = v[campo] || "";
     if (String(valorAtual).trim() === String(atual).trim()) return;
@@ -497,7 +475,6 @@ function App() {
     setE((prev) => ({ ...prev, aceitarCarro: valor }));
   };
 
-  /* ---- Texto WhatsApp ---- */
   const textoWhats = useMemo(() => {
     const linhas = [];
     linhas.push(e.proprietario.trim() ? `Olá, ${e.proprietario.trim()}! Tudo bem?` : "Olá! Tudo bem?");
@@ -574,7 +551,6 @@ function App() {
     setCopiado(false);
   };
 
-  /* ---- Campo do painel ---- */
   const campoPainel = (campo, label, placeholder, hint, icone, inputMode) => (
     <label className="block" key={campo}>
       <span className="label flex items-center gap-1.5">{icone} {label}</span>
@@ -921,16 +897,23 @@ function App() {
         <textarea ref={areaTexto} aria-hidden="true" tabIndex={-1} className="no-print absolute h-1 w-1 opacity-0" readOnly />
 
         <article className="proposal-doc print-clean overflow-hidden rounded-[20px] bg-[var(--surface)] shadow-[0_18px_50px_rgba(15,76,129,0.13)]">
-          <div className="bg-[var(--blue)] px-5 py-3.5 text-white sm:px-7 sm:py-4">
-            <div className="mb-0.5 flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.18em] text-blue-100">
-              <span className="h-px w-7 rounded-full bg-white/60"></span> Documento comercial
+          
+          {/* CABEÇALHO COM LOGO E TÍTULO FORMATADO */}
+          <div className="bg-white border-b-2 border-[var(--blue)] px-5 pt-6 pb-4 text-center sm:px-7 sm:pt-8 sm:pb-5">
+            <div className="mb-3 flex justify-center">
+              <img 
+                src="https://i.ibb.co/3kR4V8B/logo-placeholder.png" 
+                alt="R.C. Almeida - Soluções em Negócios Imobiliários" 
+                className="h-16 w-auto sm:h-20 object-contain"
+                onError={(ev) => { ev.target.style.display = 'none'; }} 
+              />
             </div>
-            <h2 className="font-display text-[22px] font-extrabold leading-none sm:text-[26px]"
+            <h2 className="font-display text-[20px] font-extrabold text-[var(--blue)] tracking-[0.1em] uppercase sm:text-[24px]"
                 contentEditable={editTextos} suppressContentEditableWarning
                 onBlur={(ev) => atualizarTexto("tituloDoc", ev.currentTarget.innerText)}>
               {tituloFinal}
             </h2>
-            <p className="mt-1 text-[12px] font-semibold uppercase tracking-[0.12em] text-blue-100">Para aprovação do proprietário</p>
+            <p className="mt-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--muted)]">Para aprovação do proprietário</p>
           </div>
 
           <div className="proposal-body px-5 py-4 sm:px-7 sm:py-5">
