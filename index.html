@@ -99,7 +99,7 @@ body{background:var(--bg);color:var(--ink);font-family:"Public Sans",system-ui,-
 .min-h-\[72px\]{min-height:72px}.min-h-\[96px\]{min-height:96px}.min-h-screen{min-height:100vh}
 .max-w-\[1080px\]{max-width:1080px}.max-w-\[620px\]{max-width:620px}
 .cursor-pointer{cursor:pointer}.resize-y{resize:vertical}
-.divide-x>:not([hidden])~:not([hidden]){border-right-width:calc(1px * 0);border-left-width:calc(1px * calc(1 - 0))}
+.divide-x>:not([hidden])~:not([hidden]){border-left-width:1px}
 .divide-\[var\(--line\)\]>:not([hidden])~:not([hidden]){border-color:var(--line)}
 .rounded-full.bg-white\/60{background-color:rgba(255,255,255,.6)}
 .opacity-0{opacity:0}
@@ -153,48 +153,47 @@ body{background:var(--bg);color:var(--ink);font-family:"Public Sans",system-ui,-
 <div id="root"></div>
 
 <script type="text/babel" data-presets="react">
-const { useState, useRef, useMemo, useEffect } = React;
+const { useState, useRef, useMemo } = React;
 
-/* ---------------- Ícones (inline SVG minimalistas) ---------------- */
+/* ========== ÍCONES (SVG inline) ========== */
 const Icon = ({ children, size = 16, className = "", ...p }) => (
   <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24"
        fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
        className={"lucide " + className} {...p}>{children}</svg>
 );
-const Bath     = (p) => <Icon {...p}><path d="M10 4 8 6"/><path d="M17 19v2"/><path d="M2 12h20"/><path d="M7 19v2"/><path d="M9 5 7.6 3.6A2.1 2.1 0 0 0 4 5v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5"/></Icon>;
-const BedDouble= (p) => <Icon {...p}><path d="M2 20v-8a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v8"/><path d="M4 10V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v4"/><path d="M12 4v6"/><path d="M2 18h20"/></Icon>;
-const Building = (p) => <Icon {...p}><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></Icon>;
-const Calculator=(p)=> <Icon {...p}><rect width="16" height="20" x="4" y="2" rx="2"/><line x1="8" x2="16" y1="6" y2="6"/><line x1="16" x2="16" y1="14" y2="18"/><path d="M16 10h.01"/><path d="M12 10h.01"/><path d="M8 10h.01"/><path d="M12 14h.01"/><path d="M8 14h.01"/><path d="M12 18h.01"/><path d="M8 18h.01"/></Icon>;
-const Car      = (p) => <Icon {...p}><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></Icon>;
-const Check    = (p) => <Icon {...p}><path d="M20 6 9 17l-5-5"/></Icon>;
-const Copy     = (p) => <Icon {...p}><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></Icon>;
-const Eye      = (p) => <Icon {...p}><path d="M2.1 12.3a1 1 0 0 1 0-.7 10.75 10.75 0 0 1 19.9 0 1 1 0 0 1 0 .7 10.75 10.75 0 0 1-19.9 0"/><circle cx="12" cy="12" r="3"/></Icon>;
-const FileText = (p) => <Icon {...p}><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></Icon>;
-const HandCoins= (p) => <Icon {...p}><path d="M11 15h2a2 2 0 1 0 0-4h-3c-.6 0-1.1.2-1.4.6L3 17"/><path d="m7 21 1.6-1.4c.3-.4.8-.6 1.4-.6h4c1.1 0 2.1-.4 2.8-1.2l4.6-4.4a2 2 0 0 0-2.75-2.91l-4.2 3.9"/><path d="m2 16 6 6"/><circle cx="16" cy="9" r="2.9"/><circle cx="6" cy="5" r="3"/></Icon>;
-const Hash     = (p) => <Icon {...p}><line x1="4" x2="20" y1="9" y2="9"/><line x1="4" x2="20" y1="15" y2="15"/><line x1="10" x2="8" y1="3" y2="21"/><line x1="16" x2="14" y1="3" y2="21"/></Icon>;
-const House    = (p) => <Icon {...p}><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .7-1.5l7-6a2 2 0 0 1 2.6 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></Icon>;
-const KeyRound = (p) => <Icon {...p}><path d="M2.6 17.4A2 2 0 0 0 2 18.8V21a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h1a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h.2a2 2 0 0 0 1.4-.6l.8-.8a6.5 6.5 0 1 0-4-4z"/><circle cx="16.5" cy="7.5" r=".5" fill="currentColor"/></Icon>;
-const Landmark = (p) => <Icon {...p}><line x1="3" x2="21" y1="22" y2="22"/><line x1="6" x2="6" y1="18" y2="11"/><line x1="10" x2="10" y1="18" y2="11"/><line x1="14" x2="14" y1="18" y2="11"/><line x1="18" x2="18" y1="18" y2="11"/><polygon points="12 2 20 7 4 7"/></Icon>;
-const Layers   = (p) => <Icon {...p}><path d="M12.8 2.2a2 2 0 0 0-1.7 0L2.6 6.1a1 1 0 0 0 0 1.8l8.6 3.9a2 2 0 0 0 1.7 0l8.6-3.9a1 1 0 0 0 0-1.8z"/><path d="M2 12a1 1 0 0 0 .6.9l8.6 3.9a2 2 0 0 0 1.6 0l8.6-3.9A1 1 0 0 0 22 12"/><path d="M2 17a1 1 0 0 0 .6.9l8.6 3.9a2 2 0 0 0 1.6 0l8.6-3.9A1 1 0 0 0 22 17"/></Icon>;
-const MapPin   = (p) => <Icon {...p}><path d="M20 10c0 5-5.5 10.2-7.4 11.8a1 1 0 0 1-1.2 0C9.5 20.2 4 15 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></Icon>;
-const Pencil   = (p) => <Icon {...p}><path d="M12 20h9"/><path d="M16.4 3.6a1 1 0 0 1 3 3L7.4 18.6a2 2 0 0 1-.9.5l-2.9.8a.5.5 0 0 1-.6-.6l.8-2.9a2 2 0 0 1 .5-.9z"/><path d="m15 5 3 3"/></Icon>;
-const Percent  = (p) => <Icon {...p}><line x1="19" x2="5" y1="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></Icon>;
-const Phone    = (p) => <Icon {...p}><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.1 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7 12.8 12.8 0 0 0 .7 2.8 2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.5 12.8 12.8 0 0 0 2.8.7A2 2 0 0 1 22 16.9z"/></Icon>;
-const Rotate   = (p) => <Icon {...p}><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></Icon>;
-const Ruler    = (p) => <Icon {...p}><path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.4 2.4 0 0 1 0-3.4l2.6-2.6a2.4 2.4 0 0 1 3.4 0Z"/><path d="m14.5 12.5 2-2"/><path d="m11.5 9.5 2-2"/><path d="m8.5 6.5 2-2"/><path d="m17.5 15.5 2-2"/></Icon>;
-const Shield   = (p) => <Icon {...p}><path d="M20 13c0 5-3.5 7.5-7.7 9a1 1 0 0 1-.6 0C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.2-2.7a1.2 1.2 0 0 1 1.5 0C14.5 3.8 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></Icon>;
-const Sparkles = (p) => <Icon {...p}><path d="M9.9 15.5A2 2 0 0 0 8.5 14L2.4 12.5a.5.5 0 0 1 0-1L8.5 10A2 2 0 0 0 9.9 8.5l1.6-6.1a.5.5 0 0 1 1 0L14 8.5a2 2 0 0 0 1.4 1.4l6.1 1.6a.5.5 0 0 1 0 1L15.5 14a2 2 0 0 0-1.4 1.4l-1.6 6.1a.5.5 0 0 1-1 0z"/><path d="M20 3v4"/><path d="M22 5h-4"/><path d="M4 17v2"/><path d="M5 18H3"/></Icon>;
-const Warn     = (p) => <Icon {...p}><path d="m21.7 18-8-14a2 2 0 0 0-3.5 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.7-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></Icon>;
-const User     = (p) => <Icon {...p}><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></Icon>;
-const Warehouse= (p) => <Icon {...p}><path d="M22 8.4V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8.4a2 2 0 0 1 1.3-1.9l8-3.2a2 2 0 0 1 1.5 0l8 3.2A2 2 0 0 1 22 8.4Z"/><path d="M6 18h12"/><path d="M6 14h12"/><rect width="12" height="12" x="6" y="10"/></Icon>;
+const Bath      = (p) => <Icon {...p}><path d="M10 4 8 6"/><path d="M17 19v2"/><path d="M2 12h20"/><path d="M7 19v2"/><path d="M9 5 7.6 3.6A2.1 2.1 0 0 0 4 5v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5"/></Icon>;
+const BedDouble = (p) => <Icon {...p}><path d="M2 20v-8a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v8"/><path d="M4 10V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v4"/><path d="M12 4v6"/><path d="M2 18h20"/></Icon>;
+const Building  = (p) => <Icon {...p}><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></Icon>;
+const Calculator= (p) => <Icon {...p}><rect width="16" height="20" x="4" y="2" rx="2"/><line x1="8" x2="16" y1="6" y2="6"/><line x1="16" x2="16" y1="14" y2="18"/><path d="M16 10h.01"/><path d="M12 10h.01"/><path d="M8 10h.01"/><path d="M12 14h.01"/><path d="M8 14h.01"/><path d="M12 18h.01"/><path d="M8 18h.01"/></Icon>;
+const Car       = (p) => <Icon {...p}><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></Icon>;
+const Check     = (p) => <Icon {...p}><path d="M20 6 9 17l-5-5"/></Icon>;
+const Copy      = (p) => <Icon {...p}><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></Icon>;
+const Eye       = (p) => <Icon {...p}><path d="M2.1 12.3a1 1 0 0 1 0-.7 10.75 10.75 0 0 1 19.9 0 1 1 0 0 1 0 .7 10.75 10.75 0 0 1-19.9 0"/><circle cx="12" cy="12" r="3"/></Icon>;
+const FileText  = (p) => <Icon {...p}><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></Icon>;
+const HandCoins = (p) => <Icon {...p}><path d="M11 15h2a2 2 0 1 0 0-4h-3c-.6 0-1.1.2-1.4.6L3 17"/><path d="m7 21 1.6-1.4c.3-.4.8-.6 1.4-.6h4c1.1 0 2.1-.4 2.8-1.2l4.6-4.4a2 2 0 0 0-2.75-2.91l-4.2 3.9"/><path d="m2 16 6 6"/><circle cx="16" cy="9" r="2.9"/><circle cx="6" cy="5" r="3"/></Icon>;
+const Hash      = (p) => <Icon {...p}><line x1="4" x2="20" y1="9" y2="9"/><line x1="4" x2="20" y1="15" y2="15"/><line x1="10" x2="8" y1="3" y2="21"/><line x1="16" x2="14" y1="3" y2="21"/></Icon>;
+const House     = (p) => <Icon {...p}><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .7-1.5l7-6a2 2 0 0 1 2.6 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></Icon>;
+const KeyRound  = (p) => <Icon {...p}><path d="M2.6 17.4A2 2 0 0 0 2 18.8V21a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h1a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h.2a2 2 0 0 0 1.4-.6l.8-.8a6.5 6.5 0 1 0-4-4z"/><circle cx="16.5" cy="7.5" r=".5" fill="currentColor"/></Icon>;
+const Landmark  = (p) => <Icon {...p}><line x1="3" x2="21" y1="22" y2="22"/><line x1="6" x2="6" y1="18" y2="11"/><line x1="10" x2="10" y1="18" y2="11"/><line x1="14" x2="14" y1="18" y2="11"/><line x1="18" x2="18" y1="18" y2="11"/><polygon points="12 2 20 7 4 7"/></Icon>;
+const Layers    = (p) => <Icon {...p}><path d="M12.8 2.2a2 2 0 0 0-1.7 0L2.6 6.1a1 1 0 0 0 0 1.8l8.6 3.9a2 2 0 0 0 1.7 0l8.6-3.9a1 1 0 0 0 0-1.8z"/><path d="M2 12a1 1 0 0 0 .6.9l8.6 3.9a2 2 0 0 0 1.6 0l8.6-3.9A1 1 0 0 0 22 12"/><path d="M2 17a1 1 0 0 0 .6.9l8.6 3.9a2 2 0 0 0 1.6 0l8.6-3.9A1 1 0 0 0 22 17"/></Icon>;
+const MapPin    = (p) => <Icon {...p}><path d="M20 10c0 5-5.5 10.2-7.4 11.8a1 1 0 0 1-1.2 0C9.5 20.2 4 15 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></Icon>;
+const Pencil    = (p) => <Icon {...p}><path d="M12 20h9"/><path d="M16.4 3.6a1 1 0 0 1 3 3L7.4 18.6a2 2 0 0 1-.9.5l-2.9.8a.5.5 0 0 1-.6-.6l.8-2.9a2 2 0 0 1 .5-.9z"/><path d="m15 5 3 3"/></Icon>;
+const Percent   = (p) => <Icon {...p}><line x1="19" x2="5" y1="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></Icon>;
+const Phone     = (p) => <Icon {...p}><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.1 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7 12.8 12.8 0 0 0 .7 2.8 2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.5 12.8 12.8 0 0 0 2.8.7A2 2 0 0 1 22 16.9z"/></Icon>;
+const Rotate    = (p) => <Icon {...p}><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></Icon>;
+const Ruler     = (p) => <Icon {...p}><path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.4 2.4 0 0 1 0-3.4l2.6-2.6a2.4 2.4 0 0 1 3.4 0Z"/><path d="m14.5 12.5 2-2"/><path d="m11.5 9.5 2-2"/><path d="m8.5 6.5 2-2"/><path d="m17.5 15.5 2-2"/></Icon>;
+const Shield    = (p) => <Icon {...p}><path d="M20 13c0 5-3.5 7.5-7.7 9a1 1 0 0 1-.6 0C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.2-2.7a1.2 1.2 0 0 1 1.5 0C14.5 3.8 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></Icon>;
+const Sparkles  = (p) => <Icon {...p}><path d="M9.9 15.5A2 2 0 0 0 8.5 14L2.4 12.5a.5.5 0 0 1 0-1L8.5 10A2 2 0 0 0 9.9 8.5l1.6-6.1a.5.5 0 0 1 1 0L14 8.5a2 2 0 0 0 1.4 1.4l6.1 1.6a.5.5 0 0 1 0 1L15.5 14a2 2 0 0 0-1.4 1.4l-1.6 6.1a.5.5 0 0 1-1 0z"/><path d="M20 3v4"/><path d="M22 5h-4"/><path d="M4 17v2"/><path d="M5 18H3"/></Icon>;
+const Warn      = (p) => <Icon {...p}><path d="m21.7 18-8-14a2 2 0 0 0-3.5 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.7-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></Icon>;
+const User      = (p) => <Icon {...p}><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></Icon>;
+const Warehouse = (p) => <Icon {...p}><path d="M22 8.4V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8.4a2 2 0 0 1 1.3-1.9l8-3.2a2 2 0 0 1 1.5 0l8 3.2A2 2 0 0 1 22 8.4Z"/><path d="M6 18h12"/><path d="M6 14h12"/><rect width="12" height="12" x="6" y="10"/></Icon>;
 
-/* ---------------- Formatação e utilidades ---------------- */
+/* ========== FORMATAÇÃO E UTILIDADES ========== */
 const fmtBRL = (v) =>
   new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 2 })
     .format(Number.isFinite(v) ? v : 0);
 
-/* CORREÇÃO 1: U trata vazio/null/undefined corretamente.
-   Antes: Number("") === 0 → U("") retornava 0 e o fallback ||1 não era acionado. */
+/* Trata vazio/null/undefined corretamente — não vira 0 */
 function U(v, fallback = 0) {
   if (v === "" || v === null || v === undefined) return fallback;
   const s = String(v).trim();
@@ -203,7 +202,7 @@ function U(v, fallback = 0) {
   return Number.isFinite(n) ? n : fallback;
 }
 
-/* ---------------- Dados iniciais ---------------- */
+/* ========== DADOS INICIAIS ========== */
 const TEXTO_PADRAO = {
   tituloDoc: "", saudacao: "", apresentacao: "", comoFunciona: "", carro: "", rodape: "", condicoes: "", rotuloTotal: ""
 };
@@ -213,13 +212,13 @@ const ESTADO_INICIAL = {
   loteamento: "Portal Itapeva", quadra: "A", lote: "08", metragem: "175",
   areaConstruida: "", quartos: "", banheiros: "", vagas: "", diferenciais: "",
   blocoApto: "", andar: "", areaTotal: "", valorCondominio: "", peDireito: "", uso: "",
-  cidade: "Itapeva/SP", valorTotal: "105000", pctCaixa: "80", pctEntrada: "20",
-  valorEntrada: "21000", parcelas: "4", primeiraDiferente: false, valorPrimeira: "",
+  cidade: "Itapeva/SP", valorTotal: "125000", pctCaixa: "80", pctEntrada: "20",
+  valorEntrada: "25000", parcelas: "1", primeiraDiferente: false, valorPrimeira: "",
   jurosTipo: "Sem juros", jurosMes: "1",
   formaPrimeira: "Na assinatura do contrato Caixa", formaPrimeiraOutro: "",
-  corretor: "R.C. Almeida", telefone: "(15) 99999-0000",
-  aceitarCarro: false, carroModelo: "Fiat Toro Freedom", carroAno: "2021", placa: "",
-  carroValor: "75000", carroAbate: "", custoTransferencia: "Comprador"
+  corretor: "Renato Camargo", telefone: "(15) 99703-8249",
+  aceitarCarro: false, carroModelo: "", carroAno: "", placa: "",
+  carroValor: "", carroAbate: "", custoTransferencia: "Comprador"
 };
 
 const TIPOS = ["Terreno / Lote","Casa","Apartamento","Chácara / Sítio","Sobrado","Cobertura","Sala Comercial","Galpão","Prédio"];
@@ -237,7 +236,7 @@ const EXEMPLOS = {
   "Prédio": { metragem:"500", areaConstruida:"600", quartos:"", banheiros:"4", vagas:"6", diferenciais:"Prédio inteiro, fachada comercial", blocoApto:"", andar:"", areaTotal:"600", valorCondominio:"", peDireito:"3 m", uso:"Comercial / residencial" }
 };
 
-/* CORREÇÃO 5: Error Boundary — nunca deixa a tela "sumir". */
+/* ========== ERROR BOUNDARY ========== */
 class ErrorBoundary extends React.Component {
   constructor(p) { super(p); this.state = { erro: null }; }
   static getDerivedStateFromError(e) { return { erro: e }; }
@@ -262,7 +261,7 @@ class ErrorBoundary extends React.Component {
   }
 }
 
-/* ---------------- Componente principal ---------------- */
+/* ========== COMPONENTE PRINCIPAL ========== */
 function App() {
   const [e, setE] = useState(ESTADO_INICIAL);
   const [copiado, setCopiado] = useState(false);
@@ -273,7 +272,7 @@ function App() {
   const [okTextos, setOkTextos] = useState(false);
   const areaTexto = useRef(null);
 
-  /* Cálculos — CORREÇÃO 2: f com ||1 DEPOIS do U, garantindo mínimo 1 mesmo se vazio. */
+  /* ---- Cálculos ---- */
   const valorTotal = U(e.valorTotal);
   const pctCaixa   = Math.min(100, Math.max(0, U(e.pctCaixa)));
   const pctEntrada = Math.min(100, Math.max(0, U(e.pctEntrada)));
@@ -329,7 +328,7 @@ function App() {
   const diferenca = valorTotal - totalRecebido;
   const fecha = Math.abs(diferenca) < 0.01;
 
-  /* Textos descritivos por tipo */
+  /* ---- Características do tipo ---- */
   const ehTerreno = e.tipoImovel === "Terreno / Lote";
   const ehCasa = ["Casa","Sobrado","Chácara / Sítio"].includes(e.tipoImovel);
   const ehApto = ["Apartamento","Cobertura"].includes(e.tipoImovel);
@@ -340,6 +339,8 @@ function App() {
   const valorCondominio = U(e.valorCondominio);
   const labelLocal = ehApto ? "Condomínio / Bairro" : (ehCasa || ehComercial) ? "Bairro / Localização" : "Loteamento / Bairro";
   const labelMetragem = ehCasa ? "Metragem do terreno (m²)" : "Área total do terreno (m²)";
+
+  /* ---- Gênero / artigos dinâmicos ---- */
   const fem = ["Casa","Chácara / Sítio","Cobertura","Sala Comercial"].includes(e.tipoImovel);
   const artigo = fem ? "a" : "o";
   const possessivo = fem ? "sua" : "seu";
@@ -356,7 +357,12 @@ function App() {
   const adjetivoPronto = fem ? "pronta" : "pronto";
   const descricaoCurta = `${artigo} ${possessivo} ${nomeImovel}`;
 
-  /* Descrição do imóvel (linha do cabeçalho) */
+  /* ---- Verbo por tipo (CORRIGIDO: terreno não "mora") ---- */
+  const finalidade = ehTerreno ? "construir"
+    : ehComercial ? "uso comercial"
+    : "morar";
+
+  /* ---- Descrição do imóvel ---- */
   const descricaoImovel = useMemo(() => {
     const bairro = e.loteamento.trim();
     const cidade = e.cidade.trim();
@@ -385,7 +391,7 @@ function App() {
     return partes.join(" — ");
   }, [e, metragem, areaConstruida, areaTotal, ehTerreno, ehCasa, ehApto, ehComercial, ehPredio]);
 
-  /* Características */
+  /* ---- Características listadas ---- */
   const caracteristicas = [];
   if (U(e.quartos)) caracteristicas.push(`${U(e.quartos)} ${U(e.quartos) === 1 ? "quarto" : "quartos"}`);
   if (U(e.banheiros)) caracteristicas.push(`${U(e.banheiros)} ${U(e.banheiros) === 1 ? "banheiro" : "banheiros"}`);
@@ -395,13 +401,13 @@ function App() {
   if (e.diferenciais.trim()) caracteristicas.push(e.diferenciais.trim());
   const textoCaracteristicas = caracteristicas.join(" • ");
 
+  /* ---- Condição descrita (CORRIGIDO: verbo por finalidade) ---- */
   const descricaoCondicao = useMemo(() => {
-    if (e.condicao === "Novo")
-      return ehComercial ? `${nomeImovel} ${adjetivoNovo}, ${adjetivoPronto} para uso` : `${nomeImovel} ${adjetivoNovo}, ${adjetivoPronto} para morar`;
+    if (e.condicao === "Novo") return `${nomeImovel} ${adjetivoNovo}, ${adjetivoPronto} para ${finalidade}`;
     if (e.condicao === "Usado") return `${nomeImovel} ${adjetivoUsado}, no estado em que se encontra`;
     if (e.condicao === "Na planta") return `${nomeImovel} na planta, conforme projeto e memorial descritivo`;
     return `${nomeImovel} em construção, conforme o estágio atual da obra`;
-  }, [e.tipoImovel, e.condicao, ehComercial, nomeImovel, adjetivoNovo, adjetivoUsado, adjetivoPronto]);
+  }, [e.condicao, nomeImovel, adjetivoNovo, adjetivoUsado, adjetivoPronto, finalidade]);
 
   const comoCaixa = ehTerreno
     ? "a Caixa paga após a assinatura do contrato"
@@ -418,7 +424,9 @@ function App() {
       ? `A primeira parcela da entrada é paga ${forma1Min}. A parcela restante é paga no mês seguinte${e.jurosTipo === "Com juros simples" ? `, com juros simples de ${jurosMes}% ao mês` : e.jurosTipo === "A combinar" ? ", com juros / correção a combinar" : ", no mesmo valor"}. Neste caso, ${comoCaixa}.${e.aceitarCarro ? " Quando o veículo é aceito, ele abate a entrada e só o valor restante em dinheiro é parcelado." : ""}`
       : `A primeira parcela da entrada é paga ${forma1Min}. As demais parcelas seguem nos meses subsequentes${e.jurosTipo === "Com juros simples" ? `, com juros simples de ${jurosMes}% ao mês` : e.jurosTipo === "A combinar" ? ", com juros / correção a combinar" : ", no mesmo valor"}. Neste caso, ${comoCaixa}.${e.aceitarCarro ? " Quando o veículo é aceito, ele abate a entrada e só o valor restante em dinheiro é parcelado." : ""}`;
 
-  const carroTextoPadrao = `${modeloCarro}${anoCarro ? ` — ano ${anoCarro}` : ""}${placaCarro ? ` — placa ${placaCarro}` : ""} — avaliado em ${fmtBRL(carroValor)}, abate ${fmtBRL(carroAbatido)} na entrada. Restante: ${fmtBRL(dinheiroRestante)} em ${f === 1 ? "parcela única" : `${f}x`}. Custos de transferência: ${e.custoTransferencia.toLowerCase()}.`;
+  const carroTextoPadrao = e.aceitarCarro
+    ? `${modeloCarro}${anoCarro ? ` — ano ${anoCarro}` : ""}${placaCarro ? ` — placa ${placaCarro}` : ""} — avaliado em ${fmtBRL(carroValor)}, abate ${fmtBRL(carroAbatido)} na entrada. Restante: ${fmtBRL(dinheiroRestante)} em ${f === 1 ? "parcela única" : `${f}x`}. Custos de transferência: ${e.custoTransferencia.toLowerCase()}.`
+    : "";
 
   const rodapePadrao = "Proposta para aprovação — documento comercial, sem vínculo contratual";
   const condicoesPadrao = "Condições gerais: proposta válida para aprovação do proprietário. Valores, prazos e condições podem ser ajustados em comum acordo antes da assinatura.";
@@ -433,7 +441,7 @@ function App() {
   const condicoesFinal = pegarTexto("condicoes", condicoesPadrao);
   const rotuloTotalFinal = pegarTexto("rotuloTotal", "Total recebido pelo proprietário");
 
-  /* CORREÇÃO 4: onBlur com guarda — só atualiza se o texto mudou. */
+  /* ---- Handlers ---- */
   const atualizarTexto = (campo, valorAtual) => {
     const atual = v[campo] || "";
     if (String(valorAtual).trim() === String(atual).trim()) return;
@@ -448,7 +456,6 @@ function App() {
     setCopiado(false);
   };
 
-  /* CORREÇÃO 3: input de parcelas sanitizado (só dígitos, máx 2). */
   const alterarCampo = (campo, valor) => {
     setCopiado(false);
     setRestaurado(false);
@@ -490,10 +497,10 @@ function App() {
     setE((prev) => ({ ...prev, aceitarCarro: valor }));
   };
 
-  /* Texto para WhatsApp */
+  /* ---- Texto WhatsApp ---- */
   const textoWhats = useMemo(() => {
     const linhas = [];
-    linhas.push(`${e.proprietario.trim() ? `Olá, ${e.proprietario.trim()}! Tudo bem?` : "Olá! Tudo bem?"}`);
+    linhas.push(e.proprietario.trim() ? `Olá, ${e.proprietario.trim()}! Tudo bem?` : "Olá! Tudo bem?");
     linhas.push("");
     linhas.push(`Tenho uma *${tituloFinal}* para ${descricaoCurta} ${descricaoCondicao.replace(new RegExp(`^${nomeImovel}\\s+`), "")}:`);
     linhas.push("");
@@ -523,7 +530,7 @@ function App() {
     linhas.push("");
     linhas.push(`*Como funciona:* ${comoFuncionaFinal}`);
     linhas.push("");
-    linhas.push(`*${rotuloTotalFinal}:* ${fmtBRL(valorTotal)}${!fecha ? ` — Conferência: Caixa ${fmtBRL(valorCaixa)} + Dinheiro ${fmtBRL(dinheiroRestante)} + Carro ${fmtBRL(carroNaEntrada)} = ${fmtBRL(totalRecebido)} — Diferença: ${fmtBRL(diferenca)}` : ""}`);
+    linhas.push(`*${rotuloTotalFinal}:* ${fmtBRL(valorTotal)}`);
     linhas.push("");
     linhas.push(`*Condições gerais:* ${condicoesFinal}`);
     linhas.push("");
@@ -567,19 +574,7 @@ function App() {
     setCopiado(false);
   };
 
-  /* Campos do painel lateral */
-  const camposNumericos = [
-    { key:"proprietario", label:"Nome do proprietário (opcional)", icon:<User size={16}/>, placeholder:"Ex.: João Silva", hint:"Aparece na saudação da proposta. Pode ficar em branco." },
-    { key:"cidade", label:"Cidade / UF", icon:<MapPin size={16}/>, placeholder:"Itapeva/SP", hint:"Cidade e estado onde fica o imóvel." },
-    { key:"valorTotal", label:"Valor total do imóvel (R$)", icon:<HandCoins size={16}/>, placeholder:"105000", inputMode:"decimal", hint:"Valor cheio que o dono vai receber." },
-    { key:"pctCaixa", label:"% Financiado pela Caixa", icon:<Landmark size={16}/>, placeholder:"80", inputMode:"decimal", hint:"Parte que o banco paga direto ao dono após a assinatura." },
-    { key:"pctEntrada", label:"% Entrada do comprador", icon:<Percent size={16}/>, placeholder:"20", inputMode:"decimal", hint:"Livre — não trava mais em 100 − % Caixa. Ao mudar, o valor em R$ da entrada recalcula." },
-    { key:"valorEntrada", label:"Valor da entrada em R$ (editável)", icon:<HandCoins size={16}/>, placeholder:"21000", inputMode:"decimal", hint:"Ao mudar o R$, o % da entrada recalcula automaticamente." },
-    { key:"parcelas", label:"Nº de parcelas da entrada (1 a 24)", icon:<Calculator size={16}/>, placeholder:"4", inputMode:"numeric", hint:"Quantas vezes o comprador vai dividir a entrada. Limite: 24. Pode apagar o número — volta para 1." },
-    { key:"corretor", label:"Nome do corretor / imobiliária", icon:<FileText size={16}/>, placeholder:"R.C. Almeida", hint:"Quem assina a proposta e conversa com o dono." },
-    { key:"telefone", label:"Telefone / WhatsApp do corretor", icon:<Phone size={16}/>, placeholder:"(15) 99999-0000", type:"tel", hint:"Canal para o dono tirar dúvidas e responder." }
-  ];
-
+  /* ---- Campo do painel ---- */
   const campoPainel = (campo, label, placeholder, hint, icone, inputMode) => (
     <label className="block" key={campo}>
       <span className="label flex items-center gap-1.5">{icone} {label}</span>
@@ -718,7 +713,7 @@ function App() {
               </label>
               <label className="block">
                 <span className="label">c) Texto da opção de carro</span>
-                <textarea className="field min-h-[96px] resize-y" value={v.carro} onChange={(ev) => { setV((p) => ({...p, carro: ev.target.value})); setCopiado(false); setOkTextos(false); }} placeholder={carroTextoPadrao} aria-label="Texto da opção de carro" />
+                <textarea className="field min-h-[96px] resize-y" value={v.carro} onChange={(ev) => { setV((p) => ({...p, carro: ev.target.value})); setCopiado(false); setOkTextos(false); }} placeholder={carroTextoPadrao || "Aparece só quando o carro é aceito."} aria-label="Texto da opção de carro" />
                 <span className="mt-1 block text-xs text-[var(--muted)]">Só aparece na proposta quando “Aceitar veículo” está ligado.</span>
               </label>
               <label className="block">
@@ -821,7 +816,16 @@ function App() {
             {ehComercial && campoPainel("peDireito", "Pé-direito", "3,5 m", "Altura livre do imóvel comercial.", <Warehouse size={16}/>)}
             {ehComercial && campoPainel("uso", "Uso indicado", "Comércio / escritório", "Uso sugerido ou atual do imóvel comercial.", <Building size={16}/>)}
             {(ehCasa || ehApto || ehComercial) && campoPainel("diferenciais", "Diferenciais", ehCasa ? "Piscina, quintal" : ehComercial ? "Fachada, estacionamento" : "Terraço, piscina privativa", "Campo livre: piscina, quintal, edícula, terraço…", <Sparkles size={16}/>)}
-            {camposNumericos.map((c) => campoPainel(c.key, c.label, c.placeholder, c.hint, c.icon, c.inputMode))}
+            {[
+              { key:"cidade", label:"Cidade / UF", placeholder:"Itapeva/SP", hint:"Cidade e estado onde fica o imóvel.", icon:<MapPin size={16}/>, inputMode:"text" },
+              { key:"valorTotal", label:"Valor total do imóvel (R$)", placeholder:"125000", hint:"Valor cheio que o dono vai receber.", icon:<HandCoins size={16}/>, inputMode:"decimal" },
+              { key:"pctCaixa", label:"% Financiado pela Caixa", placeholder:"80", hint:"Parte que o banco paga direto ao dono após a assinatura.", icon:<Landmark size={16}/>, inputMode:"decimal" },
+              { key:"pctEntrada", label:"% Entrada do comprador", placeholder:"20", hint:"Livre — não trava em 100 − % Caixa. Ao mudar, o valor em R$ da entrada recalcula.", icon:<Percent size={16}/>, inputMode:"decimal" },
+              { key:"valorEntrada", label:"Valor da entrada em R$ (editável)", placeholder:"25000", hint:"Ao mudar o R$, o % da entrada recalcula automaticamente.", icon:<HandCoins size={16}/>, inputMode:"decimal" },
+              { key:"parcelas", label:"Nº de parcelas da entrada (1 a 24)", placeholder:"1", hint:"Quantas vezes o comprador vai dividir a entrada. Pode apagar — volta para 1.", icon:<Calculator size={16}/>, inputMode:"numeric" },
+              { key:"corretor", label:"Nome do corretor / imobiliária", placeholder:"Renato Camargo", hint:"Quem assina a proposta e conversa com o dono.", icon:<FileText size={16}/>, inputMode:"text" },
+              { key:"telefone", label:"Telefone / WhatsApp do corretor", placeholder:"(15) 99703-8249", hint:"Canal para o dono tirar dúvidas e responder.", icon:<Phone size={16}/>, inputMode:"tel" }
+            ].map((c) => campoPainel(c.key, c.label, c.placeholder, c.hint, c.icon, c.inputMode))}
           </div>
 
           <div className="border-t border-[var(--line)] p-4 sm:p-6">
@@ -849,27 +853,22 @@ function App() {
                   <label className="block">
                     <span className="label">Marca / Modelo do carro</span>
                     <input className="field" value={e.carroModelo} onChange={(ev) => alterarCampo("carroModelo", ev.target.value)} placeholder="Ex.: Fiat Toro Freedom" aria-label="Marca / Modelo do carro" />
-                    <span className="mt-1 block text-xs leading-snug text-[var(--muted)]">Veículo que o comprador vai entregar.</span>
                   </label>
                   <label className="block">
                     <span className="label">Ano</span>
                     <input className="field" value={e.carroAno} onChange={(ev) => alterarCampo("carroAno", ev.target.value)} placeholder="2021" inputMode="numeric" aria-label="Ano do carro" />
-                    <span className="mt-1 block text-xs leading-snug text-[var(--muted)]">Ano de fabricação ou modelo.</span>
                   </label>
                   <label className="block">
                     <span className="label">Placa (opcional)</span>
                     <input className="field" value={e.placa} onChange={(ev) => alterarCampo("placa", ev.target.value)} placeholder="Ex.: ABC-1234" aria-label="Placa do carro" />
-                    <span className="mt-1 block text-xs leading-snug text-[var(--muted)]">Opcional — aparece na proposta se preenchida.</span>
                   </label>
                   <label className="block">
                     <span className="label">Valor avaliado do carro (R$)</span>
                     <input className="field" value={e.carroValor} onChange={(ev) => alterarCampo("carroValor", ev.target.value)} placeholder="75000" inputMode="decimal" aria-label="Valor avaliado do carro" />
-                    <span className="mt-1 block text-xs leading-snug text-[var(--muted)]">Quanto o carro vale na avaliação.</span>
                   </label>
                   <label className="block">
                     <span className="label">Quanto do carro abate na entrada (R$)</span>
                     <input className="field" value={e.carroAbate} onChange={(ev) => alterarCampo("carroAbate", ev.target.value)} placeholder="Igual ao valor avaliado" inputMode="decimal" aria-label="Quanto do carro abate na entrada" />
-                    <span className="mt-1 block text-xs leading-snug text-[var(--muted)]">Se ficar em branco, usa o valor avaliado.</span>
                   </label>
                   <label className="block">
                     <span className="label">Quem fica com custos de transferência?</span>
@@ -878,13 +877,11 @@ function App() {
                       <option>Vendedor</option>
                       <option>Dividido</option>
                     </select>
-                    <span className="mt-1 block text-xs leading-snug text-[var(--muted)]">Quem paga a transferência do veículo.</span>
                   </label>
                 </div>
                 <label className="mt-4 block">
                   <span className="label">Texto de explicação do carro</span>
                   <textarea className="field min-h-[72px] resize-y" value={v.carro} onChange={(ev) => { setV((p) => ({...p, carro: ev.target.value})); setCopiado(false); setOkTextos(false); }} placeholder={carroTextoPadrao} aria-label="Texto de explicação do carro" />
-                  <span className="mt-1 block text-xs text-[var(--muted)]">Aparece na seção do veículo da proposta.</span>
                 </label>
                 {carroExcede && (
                   <div className="mt-4 flex items-start gap-2 rounded-xl border border-[var(--amber-line)] bg-[var(--amber)] px-4 py-3 text-sm font-semibold" role="alert">
@@ -989,7 +986,7 @@ function App() {
                     <td data-label="Descrição"><strong>Entrada do comprador</strong></td>
                     <td data-label="Percentual"><strong>{pctEntrada}%</strong></td>
                     <td data-label="Valor"><strong>{fmtBRL(valorEntrada)}</strong></td>
-                    <td data-label="Condições">{condParcelas}</td>
+                    <td data-label="Condições">{textoParcelasCurto}</td>
                   </tr>
                   {e.aceitarCarro && (
                     <React.Fragment>
@@ -1010,18 +1007,6 @@ function App() {
                       </tr>
                     </React.Fragment>
                   )}
-                  <tr>
-                    <td data-label="Descrição"><strong>Parcelas da entrada</strong></td>
-                    <td data-label="Percentual">—</td>
-                    <td data-label="Valor"><strong>{fmtBRL(e.aceitarCarro ? dinheiroRestante : valorEntrada)}</strong></td>
-                    <td data-label="Condições">
-                      {f === 1
-                        ? <span>Parcela única de <strong>{fmtBRL(primeiraParcela)}</strong> {forma1Min}</span>
-                        : f === 2
-                          ? <span>1ª de <strong>{fmtBRL(primeiraParcela)}</strong> {forma1} + 1 parcela de <strong>{fmtBRL(parcelaComJuros)}</strong> no mês seguinte{sufixoJuros}</span>
-                          : <span>1ª de <strong>{fmtBRL(primeiraParcela)}</strong> {forma1} + {demaisParcelas}x de <strong>{fmtBRL(parcelaComJuros)}</strong> nos meses subsequentes{sufixoJuros}</span>}
-                    </td>
-                  </tr>
                 </tbody>
               </table>
             </div>
@@ -1052,7 +1037,7 @@ function App() {
 
             <div className="rounded-xl border border-[var(--line)] bg-[var(--surface-2)] px-3 py-2.5 text-[13px] leading-snug">
               <p className="text-justify">
-                <strong>Conferência:</strong> Caixa {fmtBRL(valorCaixa)} + Entrada em dinheiro {fmtBRL(dinheiroRestante)} + Carro {fmtBRL(carroNaEntrada)} = <strong>{fmtBRL(totalRecebido)}</strong>{" "}
+                <strong>Conferência:</strong> Caixa {fmtBRL(valorCaixa)} + Entrada em dinheiro {fmtBRL(dinheiroRestante)}{e.aceitarCarro ? ` + Carro ${fmtBRL(carroNaEntrada)}` : ""} = <strong>{fmtBRL(totalRecebido)}</strong>{" "}
                 {fecha
                   ? <span className="text-[var(--green-dark)] font-bold">— Fecha com o valor total.</span>
                   : <span className="font-bold text-red-600">— Diferença de {fmtBRL(diferenca)} em relação ao valor total de {fmtBRL(valorTotal)}.</span>}
